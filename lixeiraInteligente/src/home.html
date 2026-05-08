@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Mobile Clone</title>
+    <style>
+        /* Estilos Gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container que simula a tela do celular */
+        .app-container {
+            width: 360px;
+            height: 640px;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Menu Hambúrguer (Topo) */
+        .header {
+            padding: 20px;
+            background-color: #333;
+        }
+
+        .menu-btn {
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .menu-btn span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        .map-container{
+            margin-right: 500px;
+        }
+
+        /* Barra de Navegação Inferior */
+        .nav-wrapper {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-bar {
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 40px;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #333;
+            min-width: 90px;
+        }
+
+        .nav-item.active {
+            background-color: #e0e0e0;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Ícones feitos com CSS */
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .diamond {
+            background-color: #2ecc71; /* Verde */
+            transform: rotate(45deg);
+            width: 14px;
+            height: 14px;
+            margin-bottom: 4px;
+        }
+
+        .circle {
+            background-color: #000;
+            border-radius: 50%;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 18px solid #000;
+        }
+
+        /* Cor do texto do item ativo */
+        .nav-item.active span {
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="header">
+            <div class="menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </header>
+
+        <main style="flex: 1;">
+            <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14883.891363020592!2d-48.94923315!3d-21.1534791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1778282587951!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </main>
+        
+
+        <div class="nav-wrapper">
+            <nav class="nav-bar">
+                <div class="nav-item active" onclick="setActive(this)">
+                    <div class="icon diamond"></div>
+                    <span>Iniciar</span>
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <div class="icon circle"></div>
+                    <span>Lixeiras</span>
+                </div>
+                <div class="nav-item" onclick="setActive(this)">
+                    <div class="icon triangle"></div>
+                    <span>Relatório</span>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        function setActive(element) {
+            // Remove a classe 'active' de todos os itens
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // Adiciona a classe 'active' no item clicado
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
