@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,7 +28,7 @@
             height: 640px;
             background-color: #ffffff;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             overflow: hidden;
             display: flex;
@@ -57,9 +58,9 @@
             border-radius: 2px;
         }
 
-        .map-container{
-            margin-right: 500px;
-        }
+        /*.map-container{
+            
+        }*/
 
         /* Barra de Navegação Inferior */
         .nav-wrapper {
@@ -76,7 +77,7 @@
             align-items: center;
             padding: 5px;
             border-radius: 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
 
         .nav-item {
@@ -110,7 +111,8 @@
         }
 
         .diamond {
-            background-color: #2ecc71; /* Verde */
+            background-color: #2ecc71;
+            /* Verde */
             transform: rotate(45deg);
             width: 14px;
             height: 14px;
@@ -134,8 +136,69 @@
         .nav-item.active span {
             color: #27ae60;
         }
+
+        /* --- Estilos do Menu Lateral --- */
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: -50%;
+            /* Mantém o menu escondido fora da tela (50% da largura) */
+            width: 50%;
+            /* Ocupa exatamente metade do container */
+            height: 100%;
+            background-color: #ffffff;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease-in-out;
+            /* Animação de deslizamento */
+            z-index: 1000;
+            /* Garante que fique acima de tudo */
+            padding-top: 60px;
+            /* Espaço no topo */
+        }
+
+        /* Classe que será ativada pelo JavaScript para abrir o menu */
+        .sidebar.open {
+            left: 0;
+        }
+
+        /* Estilização dos links dentro do menu */
+        .sidebar-nav a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* --- Estilos do Fundo Escurecido (Overlay) --- */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            /* Fica logo abaixo do menu, mas acima do resto */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Classe para mostrar o overlay */
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="app-container">
@@ -147,12 +210,24 @@
             </div>
         </header>
 
+        <div class="overlay" id="overlay"></div>
+
+        <div class="sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <a href="#">Minha Conta</a>
+                <a href="#">Sair</a>
+            </nav>
+        </div>
+
         <main style="flex: 1;">
             <div class="map-container">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14883.891363020592!2d-48.94923315!3d-21.1534791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1778282587951!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14883.891363020592!2d-48.94923315!3d-21.1534791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1778282587951!5m2!1spt-BR!2sbr"
+                    width="360" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </main>
-        
+
 
         <div class="nav-wrapper">
             <nav class="nav-bar">
@@ -173,14 +248,47 @@
     </div>
 
     <script>
+        const menuBtn = document.querySelector('.menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // Função para abrir/fechar o menu
+        function toggleMenu() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        // Adiciona o evento de clique no botão hambúrguer
+        menuBtn.addEventListener('click', toggleMenu);
+
+        // Fecha o menu se o usuário clicar na área escura (overlay)
+        overlay.addEventListener('click', toggleMenu);
+
+
+        // (Mantenha sua função setActive existente aqui embaixo)
         function setActive(element) {
-            // Remove a classe 'active' de todos os itens
-            document.querySelectorAll('.nav-item').forEach(item => {
+            // 1. Seleciona todos os itens da navegação
+            const navItems = document.querySelectorAll('.nav-item');
+            const primeiroItemSpan = navItems[0].querySelector('span');
+
+            // 2. Remove a classe 'active' de todos os itens
+            navItems.forEach(item => {
                 item.classList.remove('active');
             });
-            // Adiciona a classe 'active' no item clicado
+
+            // 3. Adiciona a classe 'active' no item que foi clicado
             element.classList.add('active');
+
+            // 4. Lógica do nome dinâmico:
+            // Se o primeiro item estiver com a classe 'active', o texto é "Iniciar"
+            // Caso contrário (quando você clica em Lixeiras ou Relatório), muda para "Mapa"
+            if (navItems[0].classList.contains('active')) {
+                primeiroItemSpan.textContent = "Iniciar";
+            } else {
+                primeiroItemSpan.textContent = "Mapa";
+            }
         }
     </script>
 </body>
+
 </html>
