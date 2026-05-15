@@ -54,7 +54,7 @@ form.addEventListener('submit', (e) => {
     if (user === CREDENTIALS.username && pass === CREDENTIALS.password) {
       btnLabel.textContent = 'Acessando...';
       setTimeout(() => {
-        window.location.href = 'smartbin-dashboard.html';
+        window.location.href = '../lixeirainteligente/src/home.html';
       }, 600);
     } else {
       btn.disabled = false;
