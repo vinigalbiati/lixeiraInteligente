@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Mobile Clone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .app-container {
+            width: 360px;
+            height: 640px;
+            background-color: #ffffff;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 20px;
+            background-color: #333;
+            flex-shrink: 0;
+        }
+        .menu-btn {
+            width: 30px; height: 20px;
+            display: flex; flex-direction: column;
+            justify-content: space-between; cursor: pointer;
+        }
+        .menu-btn span { display: block; height: 3px; width: 100%; background-color: white; border-radius: 2px; }
+
+        /* MAIN */
+        main { flex: 1; position: relative; overflow: hidden; }
+
+        .main-container { width: 100%; height: 100%; }
+        .main-container iframe { width: 360px; height: 100%; border: 0; display: block; }
+
+        /* ── TELA DE LIXEIRAS ── */
+        #tela-lixeiras {
+            display: none;
+            width: 100%; height: 100%;
+            background: #f5f5f5;
+            overflow-y: auto;
+            padding: 16px 14px 90px;
+        }
+
+        .lx-header {
+            font-size: 16px; font-weight: 700; color: #222;
+            margin-bottom: 4px;
+        }
+        .lx-sub {
+            font-size: 12px; color: #888; margin-bottom: 16px;
+        }
+
+        /* resumo de contagens */
+        .lx-summary {
+            display: flex; gap: 8px; margin-bottom: 18px;
+        }
+        .summary-card {
+            flex: 1; border-radius: 10px; padding: 10px 8px;
+            text-align: center;
+        }
+        .summary-card .sc-val { font-size: 22px; font-weight: 700; line-height: 1; }
+        .summary-card .sc-lbl { font-size: 10px; margin-top: 3px; font-weight: 600; }
+        .sc-alto   { background: #fde8ea; }
+        .sc-alto   .sc-val { color: #e63946; }
+        .sc-alto   .sc-lbl { color: #c1121f; }
+        .sc-medio  { background: #fff3e0; }
+        .sc-medio  .sc-val { color: #f4a261; }
+        .sc-medio  .sc-lbl { color: #c77326; }
+        .sc-baixo  { background: #e8f5e9; }
+        .sc-baixo  .sc-val { color: #40916c; }
+        .sc-baixo  .sc-lbl { color: #2d6a4f; }
+
+        /* filtro */
+        .lx-filters {
+            display: flex; gap: 6px; margin-bottom: 14px;
+        }
+        .filter-btn {
+            padding: 5px 14px; border-radius: 20px;
+            border: none; font-size: 11px; font-weight: 700;
+            cursor: pointer; transition: all .2s; outline: none;
+        }
+        .filter-btn.active-all    { background: #333; color: #fff; }
+        .filter-btn:not(.active-all) { background: #eee; color: #555; }
+        .filter-btn.f-alto.sel  { background: #e63946; color: #fff; }
+        .filter-btn.f-medio.sel { background: #f4a261; color: #fff; }
+        .filter-btn.f-baixo.sel { background: #40916c; color: #fff; }
+
+        /* cards */
+        .lx-card {
+            background: #fff; border-radius: 12px;
+            padding: 12px 14px; margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.07);
+        }
+        .lx-card-top {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+        }
+        .lx-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+        }
+        .lx-card-name { font-size: 13px; font-weight: 700; color: #222; flex: 1; }
+        .lx-card-addr { font-size: 11px; color: #999; margin-bottom: 8px; }
+        .lx-card-bottom {
+            display: flex; align-items: center; gap: 10px;
+        }
+        /* barra de progresso */
+        .lx-bar-wrap {
+            flex: 1; height: 8px; background: #eee; border-radius: 6px; overflow: hidden;
+        }
+        .lx-bar { height: 100%; border-radius: 6px; transition: width .5s ease; }
+        .lx-pct-label { font-size: 13px; font-weight: 700; min-width: 36px; text-align: right; }
+        .lx-badge {
+            padding: 2px 8px; border-radius: 6px;
+            font-size: 10px; font-weight: 700; white-space: nowrap;
+        }
+
+        /* cores por nível */
+        .nivel-alto   .lx-dot  { background: #e63946; }
+        .nivel-alto   .lx-bar  { background: #e63946; }
+        .nivel-alto   .lx-pct-label { color: #e63946; }
+        .nivel-alto   .lx-badge { background: #fde8ea; color: #e63946; }
+
+        .nivel-medio  .lx-dot  { background: #f4a261; }
+        .nivel-medio  .lx-bar  { background: #f4a261; }
+        .nivel-medio  .lx-pct-label { color: #f4a261; }
+        .nivel-medio  .lx-badge { background: #fff3e0; color: #c77326; }
+
+        .nivel-baixo  .lx-dot  { background: #40916c; }
+        .nivel-baixo  .lx-bar  { background: #40916c; }
+        .nivel-baixo  .lx-pct-label { color: #40916c; }
+        .nivel-baixo  .lx-badge { background: #e8f5e9; color: #40916c; }
+
+        /* NAV */
+        .nav-wrapper {
+            position: absolute; bottom: 20px;
+            width: 100%; display: flex; justify-content: center;
+            z-index: 50;
+        }
+        .nav-bar {
+            background-color: #f0f0f0;
+            display: flex; align-items: center;
+            padding: 5px; border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.05);
+        }
+        .nav-item {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 10px 20px; cursor: pointer;
+            border-radius: 40px; transition: background 0.3s;
+            text-decoration: none; color: #333; min-width: 90px;
+        }
+        .nav-item.active { background-color: #e0e0e0; }
+        .nav-item span   { font-size: 11px; margin-top: 5px; font-weight: bold; }
+        .nav-item.active span { color: #27ae60; }
+
+        .icon { width: 20px; height: 20px; }
+        .diamond { background-color: #2ecc71; transform: rotate(45deg); width: 14px; height: 14px; margin-bottom: 4px; }
+        .circle  { background-color: #000; border-radius: 50%; }
+        .triangle { width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:18px solid #000; }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: absolute; top: 0; left: -50%;
+            width: 50%; height: 100%;
+            background-color: #fff;
+            box-shadow: 5px 0 15px rgba(0,0,0,.1);
+            transition: left .3s ease-in-out;
+            z-index: 1000; padding-top: 60px;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-nav a {
+            display: block; padding: 15px 20px;
+            color: #333; text-decoration: none;
+            font-weight: bold; border-bottom: 1px solid #eee;
+            transition: background .2s;
+        }
+        .sidebar-nav a:hover { background-color: #f5f5f5; }
+
+        /* OVERLAY */
+        .overlay {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,.4);
+            z-index: 999; opacity: 0; visibility: hidden;
+            transition: opacity .3s ease;
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <header class="header">
+        <div class="menu-btn">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+            <a href="#">Minha Conta</a>
+            <a href="#">Sair</a>
+        </nav>
+    </div>
+
+    <main>
+        <!-- MAPA -->
+        <div class="main-container" id="tela-mapa">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14883.891363020592!2d-48.94923315!3d-21.1534791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1778282587951!5m2!1spt-BR!2sbr"
+                allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+
+        <!-- LIXEIRAS -->
+        <div id="tela-lixeiras">
+            <div class="lx-header">🗑 Lixeiras</div>
+            <div class="lx-sub" id="lx-sub-text">Carregando...</div>
+
+            <!-- resumo -->
+            <div class="lx-summary">
+                <div class="summary-card sc-alto">
+                    <div class="sc-val" id="cnt-alto">0</div>
+                    <div class="sc-lbl">Alto</div>
+                </div>
+                <div class="summary-card sc-medio">
+                    <div class="sc-val" id="cnt-medio">0</div>
+                    <div class="sc-lbl">Médio</div>
+                </div>
+                <div class="summary-card sc-baixo">
+                    <div class="sc-val" id="cnt-baixo">0</div>
+                    <div class="sc-lbl">Baixo</div>
+                </div>
+            </div>
+
+            <!-- filtros -->
+            <div class="lx-filters">
+                <button class="filter-btn active-all" onclick="filtrar('todos')">Todos</button>
+                <button class="filter-btn f-alto"  onclick="filtrar('alto')">🔴 Alto</button>
+                <button class="filter-btn f-medio" onclick="filtrar('medio')">🟠 Médio</button>
+                <button class="filter-btn f-baixo" onclick="filtrar('baixo')">🟢 Baixo</button>
+            </div>
+
+            <!-- lista -->
+            <div id="lx-lista"></div>
+        </div>
+    </main>
+
+    <div class="nav-wrapper">
+        <nav class="nav-bar">
+            <div class="nav-item active" onclick="setActive(this)">
+                <div class="icon diamond"></div>
+                <span>Iniciar</span>
+            </div>
+            <div class="nav-item" onclick="setActive(this)">
+                <div class="icon circle"></div>
+                <span>Lixeiras</span>
+            </div>
+            <div class="nav-item" onclick="setActive(this)">
+                <div class="icon triangle"></div>
+                <span>Relatório</span>
+            </div>
+        </nav>
+    </div>
+
+</div>
+
+<script>
+// ── DADOS FICTÍCIOS ──────────────────────────────────
+const LIXEIRAS = [
+    { nome:'Lixeira Pça. Central',   addr:'Praça da República, 12',  pct:96 },
+    { nome:'Lixeira Av. Brasil',     addr:'Av. Brasil, 430',          pct:92 },
+    { nome:'Lixeira Mercado Sul',    addr:'R. das Flores, 88',        pct:88 },
+    { nome:'Lixeira Terminal B',     addr:'Terminal Rodoviário, s/n', pct:81 },
+    { nome:'Lixeira Shopping Norte', addr:'Av. República, 900',       pct:74 },
+    { nome:'Lixeira Parque Leste',   addr:'Parque Estadual, s/n',     pct:68 },
+    { nome:'Lixeira Escola Nº5',     addr:'R. Tiradentes, 201',       pct:63 },
+    { nome:'Lixeira UBS Centro',     addr:'R. das Flores, 210',       pct:45 },
+    { nome:'Lixeira Ginásio',        addr:'R. Tiradentes, 540',       pct:38 },
+    { nome:'Lixeira Posto Central',  addr:'Av. Brasil, 120',          pct:27 },
+];
+
+function getNivel(pct) {
+    if (pct >= 75) return 'alto';
+    if (pct >= 40) return 'medio';
+    return 'baixo';
+}
+
+function getNivelLabel(pct) {
+    const n = getNivel(pct);
+    return n === 'alto' ? 'Alto' : n === 'medio' ? 'Médio' : 'Baixo';
+}
+
+let filtroAtivo = 'todos';
+
+function renderLixeiras() {
+    const lista = LIXEIRAS.filter(l => filtroAtivo === 'todos' || getNivel(l.pct) === filtroAtivo);
+    const alto  = LIXEIRAS.filter(l => getNivel(l.pct) === 'alto').length;
+    const medio = LIXEIRAS.filter(l => getNivel(l.pct) === 'medio').length;
+    const baixo = LIXEIRAS.filter(l => getNivel(l.pct) === 'baixo').length;
+
+    document.getElementById('cnt-alto').textContent  = alto;
+    document.getElementById('cnt-medio').textContent = medio;
+    document.getElementById('cnt-baixo').textContent = baixo;
+    document.getElementById('lx-sub-text').textContent =
+        `${LIXEIRAS.length} lixeiras · ${alto} urgentes`;
+
+    document.getElementById('lx-lista').innerHTML = lista
+        .sort((a,b) => b.pct - a.pct)
+        .map(l => {
+            const n = getNivel(l.pct);
+            return `
+            <div class="lx-card nivel-${n}">
+                <div class="lx-card-top">
+                    <div class="lx-dot"></div>
+                    <div class="lx-card-name">${l.nome}</div>
+                    <div class="lx-badge">${getNivelLabel(l.pct)}</div>
+                </div>
+                <div class="lx-card-addr">${l.addr}</div>
+            </div>`;
+        }).join('');
+}
+
+function filtrar(tipo) {
+    filtroAtivo = tipo;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active-all','sel');
+    });
+    if (tipo === 'todos') {
+        document.querySelector('.filter-btn').classList.add('active-all');
+    } else {
+        document.querySelector(`.f-${tipo}`).classList.add('sel');
+    }
+    renderLixeiras();
+}
+
+// ── NAVEGAÇÃO ────────────────────────────────────────
+function setActive(element) {
+    const navItems = document.querySelectorAll('.nav-item');
+    const primeiroItemSpan = navItems[0].querySelector('span');
+
+    navItems.forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+
+    const label = element.querySelector('span').textContent;
+
+    if (label === 'Lixeiras') {
+        document.getElementById('tela-mapa').style.display    = 'none';
+        document.getElementById('tela-lixeiras').style.display = 'block';
+        renderLixeiras();
+    } else {
+        document.getElementById('tela-mapa').style.display    = 'block';
+        document.getElementById('tela-lixeiras').style.display = 'none';
+    }
+
+    if (navItems[0].classList.contains('active')) {
+        primeiroItemSpan.textContent = 'Iniciar';
+    } else {
+        primeiroItemSpan.textContent = 'Mapa';
+    }
+}
+
+// ── SIDEBAR ──────────────────────────────────────────
+const menuBtn = document.querySelector('.menu-btn');
+const sidebar  = document.getElementById('sidebar');
+const overlay  = document.getElementById('overlay');
+
+function toggleMenu() {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+menuBtn.addEventListener('click', toggleMenu);
+overlay.addEventListener('click', toggleMenu);
+
+// ── LIVE SIMULATION ──────────────────────────────────
+setInterval(() => {
+    LIXEIRAS.forEach(l => {
+        l.pct = Math.min(99, Math.max(10, l.pct + (Math.floor(Math.random()*5)-1)));
+    });
+    if (document.getElementById('tela-lixeiras').style.display === 'block') {
+        renderLixeiras();
+    }
+}, 8000);
+</script>
+</body>
+</html>
